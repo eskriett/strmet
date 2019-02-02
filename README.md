@@ -1,6 +1,7 @@
 # strmet
 
 [![GoDoc](https://godoc.org/github.com/eskriett/strmet?status.svg)](https://godoc.org/github.com/eskriett/strmet)
+[![Build Status](https://travis-ci.org/eskriett/strmet.svg?branch=master)](https://travis-ci.org/eskriett/strmet)
 
 Fast and memory efficient string metric algorithms.
 
