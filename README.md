@@ -1,6 +1,8 @@
 # strmet
 
-String metric algorithms.
+[![GoDoc](https://godoc.org/github.com/eskriett/strmet?status.svg)](https://godoc.org/github.com/eskriett/strmet)
+
+Fast and memory efficient string metric algorithms.
 
 Available algorithms:
 * [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
