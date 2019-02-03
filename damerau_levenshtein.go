@@ -2,7 +2,7 @@ package strmet
 
 // DamerauLevenshtein distance is a string metric for measuring the edit
 // distance between two sequences:
-// https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
+// https://en.wikipedia.org/wiki/Damerau%E3%80%93Levenshtein_distance
 //
 // This implementation has been designed using the observations of Steve
 // Hatchett:
@@ -13,75 +13,25 @@ package strmet
 // maximum distance.
 func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 
-	if maxDist < 0 {
-		return -1
+	s1, s2, s1Len, s2Len, toReturn := getRunes(str1, str2, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	s1 := []rune(str1)
-	s2 := []rune(str2)
-
-	s1Len := len(s1)
-	s2Len := len(s2)
-
-	if s1Len > s2Len {
-		s1, s2 = s2, s1
-		s1Len, s2Len = s2Len, s1Len
+	s1Len, s2Len = ignoreSuffix(s1, s2, s1Len, s2Len)
+	start, s1Len, s2Len, toReturn := ignorePrefix(s1, s2, s1Len, s2Len, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	if s1Len == 0 {
-		if s2Len <= maxDist {
-			return s2Len
-		}
-		return -1
+	s2 = s2[start : start+s2Len]
+	lenDiff, maxDist, toReturn := getLenDiff(s1Len, s2Len, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	if s1Len > s2Len {
-		s1, s2 = s2, s1
-		s1Len, s2Len = s2Len, s1Len
-	}
-
-	// Ignore suffixes common to both strings
-	for s1Len > 0 && s1[s1Len-1] == s2[s2Len-1] {
-		s1Len--
-		s2Len--
-	}
-
-	start := 0
-	if s1[start] == s2[start] || s1Len == 0 {
-
-		// Ignore prefix common to both strings
-		for start < s1Len && s1[start] == s2[start] {
-			start++
-		}
-		s1Len -= start
-		s2Len -= start
-
-		if s1Len == 0 {
-			if s2Len <= maxDist {
-				return s2Len
-			}
-			return -1
-		}
-		s2 = s2[start : start+s2Len]
-	}
-	lenDiff := s2Len - s1Len
-
-	if maxDist > s2Len {
-		maxDist = s2Len
-	} else if lenDiff > maxDist {
-		return -1
-	}
-
-	v0 := make([]int, s2Len)
+	v0 := getCharCosts(s2Len, maxDist)
 	v2 := make([]int, s2Len)
-
-	j := 0
-	for j = 0; j < maxDist; j++ {
-		v0[j] = j + 1
-	}
-	for ; j < s2Len; j++ {
-		v0[j] = maxDist + 1
-	}
 
 	jStartOffset := maxDist - lenDiff
 	haveMax := maxDist < s2Len
@@ -109,7 +59,7 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 			jEnd += 0
 		}
 
-		for j = jStart; j < jEnd; j++ {
+		for j := jStart; j < jEnd; j++ {
 			above := current
 			thisTransCost := nextTransCost
 			nextTransCost = v2[j]

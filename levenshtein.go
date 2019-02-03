@@ -15,70 +15,24 @@ package strmet
 // maximum distance.
 func Levenshtein(str1, str2 string, maxDist int) int {
 
-	if maxDist < 0 {
-		return -1
+	s1, s2, s1Len, s2Len, toReturn := getRunes(str1, str2, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	s1 := []rune(str1)
-	s2 := []rune(str2)
-
-	s1Len := len(s1)
-	s2Len := len(s2)
-
-	if s1Len > s2Len {
-		s1, s2 = s2, s1
-		s1Len, s2Len = s2Len, s1Len
+	s1Len, s2Len = ignoreSuffix(s1, s2, s1Len, s2Len)
+	start, s1Len, s2Len, toReturn := ignorePrefix(s1, s2, s1Len, s2Len, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	if s1Len == 0 {
-		if s2Len <= maxDist {
-			return s2Len
-		}
-		return -1
+	s2 = s2[start : start+s2Len]
+	lenDiff, maxDist, toReturn := getLenDiff(s1Len, s2Len, maxDist)
+	if toReturn != nil {
+		return *toReturn
 	}
 
-	// Ignore suffixes common to both strings
-	for s1Len > 0 && s1[s1Len-1] == s2[s2Len-1] {
-		s1Len--
-		s2Len--
-	}
-
-	// Ignore prefix common to both strings
-	start := 0
-	if s1[start] == s2[start] || s1Len == 0 {
-
-		// Ignore prefix common to both strings
-		for start < s1Len && s1[start] == s2[start] {
-			start++
-		}
-		s1Len -= start
-		s2Len -= start
-
-		if s1Len == 0 {
-			if s2Len <= maxDist {
-				return s2Len
-			}
-			return -1
-		}
-		s2 = s2[start : start+s2Len]
-	}
-	lenDiff := s2Len - s1Len
-
-	if maxDist > s2Len {
-		maxDist = s2Len
-	} else if lenDiff > maxDist {
-		return -1
-	}
-
-	x := make([]int, s2Len)
-
-	var j int
-	for j = 0; j < maxDist; j++ {
-		x[j] = j + 1
-	}
-	for ; j < s2Len; j++ {
-		x[j] = maxDist + 1
-	}
+	x := getCharCosts(s2Len, maxDist)
 
 	jStartOffset := maxDist - lenDiff
 	haveMax := maxDist < s2Len
