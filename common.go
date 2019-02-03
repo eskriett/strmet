@@ -61,11 +61,9 @@ func getRunes(str1, str2 string, maxDist int) ([]rune, []rune, int, int, *int) {
 func ignorePrefix(s1, s2 []rune, s1Len, s2Len, maxDist int) (int, int, int, *int) {
 	toReturn := -1
 
-	// Ignore prefix common to both strings
 	start := 0
 	if s1[start] == s2[start] || s1Len == 0 {
 
-		// Ignore prefix common to both strings
 		for start < s1Len && s1[start] == s2[start] {
 			start++
 		}
