@@ -23,7 +23,7 @@ func TestLevenshteinSanity(t *testing.T) {
 		{"abcd", "efgh", 2, -1},
 		{"abcd", "efgh", 3, -1},
 		{"abcd", "efgh", 4, 4},
-		{"town", "twon", 10, 2},
+		{"salt", "slat", 10, 2},
 		{"saturday", "sunday", 10, 3},
 		{"distance", "difference", 10, 5},
 		{"levenshtein", "frankenstein", 10, 6},

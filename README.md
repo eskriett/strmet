@@ -28,10 +28,10 @@ func main() {
         s1, s2, strmet.Levenshtein(s1, s2, 10))
 	// -> The Levenshtein distance between baseball and football is 4
 
-    s1 = "town"
-    s2 = "twon"
+    s1 = "salt"
+    s2 = "slat"
     fmt.Printf("The Damerau–Levenshtein distance between %s and %s is %d\n",
         s1, s2, strmet.DamerauLevenshtein(s1, s2, 10))
-	// -> The Damerau–Levenshtein distance between town and twon is 1
+	// -> The Damerau–Levenshtein distance between salt and slat is 1
 }
 ```
