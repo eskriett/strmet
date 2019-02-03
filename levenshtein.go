@@ -1,6 +1,6 @@
 package strmet
 
-// The Levenshtein distance between two strings is defined as the minimum
+// Levenshtein distance between two strings is defined as the minimum
 // number of edits needed to transform one string into the other, with the
 // allowable edit operations being insertion, deletion, or substitution of
 // a single character
@@ -93,13 +93,13 @@ func Levenshtein(str1, str2 string, maxDist int) int {
 		current = i
 
 		if i > jStartOffset {
-			jStart += 1
+			jStart++
 		} else {
 			jStart += 0
 		}
 
 		if jEnd < s2Len {
-			jEnd += 1
+			jEnd++
 		} else {
 			jEnd += 0
 		}

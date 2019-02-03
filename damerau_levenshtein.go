@@ -1,6 +1,6 @@
 package strmet
 
-// The Damerau–Levenshtein distance is a string metric for measuring the edit
+// DamerauLevenshtein distance is a string metric for measuring the edit
 // distance between two sequences:
 // https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
 //
@@ -98,13 +98,13 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 		nextTransCost := 0
 
 		if i > jStartOffset {
-			jStart += 1
+			jStart++
 		} else {
 			jStart += 0
 		}
 
 		if jEnd < s2Len {
-			jEnd += 1
+			jEnd++
 		} else {
 			jEnd += 0
 		}
