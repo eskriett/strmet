@@ -14,34 +14,43 @@ package strmet
 // to transform one string to another, or -1 if the distance is greater than the
 // maximum distance.
 func Levenshtein(str1, str2 string, maxDist int) int {
+	return LevenshteinRunes([]rune(str1), []rune(str2), maxDist)
+}
 
-	s1, s2, s1Len, s2Len, toReturn := getRunes(str1, str2, maxDist)
+// LevenshteinRunes is the same as Levenshtein but accepts runes instead of
+// strings
+func LevenshteinRunes(r1, r2 []rune, maxDist int) int {
+	if compareRuneSlices(r1, r2) {
+		return 0
+	}
+
+	r1, r2, r1Len, r2Len, toReturn := swapRunes(r1, r2, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	s1Len, s2Len = ignoreSuffix(s1, s2, s1Len, s2Len)
-	start, s1Len, s2Len, toReturn := ignorePrefix(s1, s2, s1Len, s2Len, maxDist)
+	r1Len, r2Len = ignoreSuffix(r1, r2, r1Len, r2Len)
+	start, r1Len, r2Len, toReturn := ignorePrefix(r1, r2, r1Len, r2Len, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	s2 = s2[start : start+s2Len]
-	lenDiff, maxDist, toReturn := getLenDiff(s1Len, s2Len, maxDist)
+	r2 = r2[start : start+r2Len]
+	lenDiff, maxDist, toReturn := getLenDiff(r1Len, r2Len, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	x := getCharCosts(s2Len, maxDist)
+	x := getCharCosts(r2Len, maxDist)
 
 	jStartOffset := maxDist - lenDiff
-	haveMax := maxDist < s2Len
+	haveMax := maxDist < r2Len
 	jStart := 0
 	jEnd := maxDist
 
 	current := 0
-	for i := 0; i < s1Len; i++ {
-		c := s1[start+i]
+	for i := 0; i < r1Len; i++ {
+		c := r1[start+i]
 
 		left := i
 		current = i
@@ -52,7 +61,7 @@ func Levenshtein(str1, str2 string, maxDist int) int {
 			jStart += 0
 		}
 
-		if jEnd < s2Len {
+		if jEnd < r2Len {
 			jEnd++
 		} else {
 			jEnd += 0
@@ -63,7 +72,7 @@ func Levenshtein(str1, str2 string, maxDist int) int {
 			current = left
 			left = x[j]
 
-			if c != s2[j] {
+			if c != r2[j] {
 				current++
 
 				del := above + 1

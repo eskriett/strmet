@@ -12,37 +12,46 @@ package strmet
 // to transform one string to another, or -1 if the distance is greater than the
 // maximum distance.
 func DamerauLevenshtein(str1, str2 string, maxDist int) int {
+	return DamerauLevenshteinRunes([]rune(str1), []rune(str2), maxDist)
+}
 
-	s1, s2, s1Len, s2Len, toReturn := getRunes(str1, str2, maxDist)
+// DamerauLevenshteinRunes is the same as DamerauLevenshtein but accepts runes
+// instead of strings
+func DamerauLevenshteinRunes(r1, r2 []rune, maxDist int) int {
+	if compareRuneSlices(r1, r2) {
+		return 0
+	}
+
+	r1, r2, r1Len, r2Len, toReturn := swapRunes(r1, r2, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	s1Len, s2Len = ignoreSuffix(s1, s2, s1Len, s2Len)
-	start, s1Len, s2Len, toReturn := ignorePrefix(s1, s2, s1Len, s2Len, maxDist)
+	r1Len, r2Len = ignoreSuffix(r1, r2, r1Len, r2Len)
+	start, r1Len, r2Len, toReturn := ignorePrefix(r1, r2, r1Len, r2Len, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	s2 = s2[start : start+s2Len]
-	lenDiff, maxDist, toReturn := getLenDiff(s1Len, s2Len, maxDist)
+	r2 = r2[start : start+r2Len]
+	lenDiff, maxDist, toReturn := getLenDiff(r1Len, r2Len, maxDist)
 	if toReturn != nil {
 		return *toReturn
 	}
 
-	v0 := getCharCosts(s2Len, maxDist)
-	v2 := make([]int, s2Len)
+	v0 := getCharCosts(r2Len, maxDist)
+	v2 := make([]int, r2Len)
 
 	jStartOffset := maxDist - lenDiff
-	haveMax := maxDist < s2Len
+	haveMax := maxDist < r2Len
 	jStart := 0
 	jEnd := maxDist
-	s1Char := s1[0]
+	s1Char := r1[0]
 	current := 0
-	for i := 0; i < s1Len; i++ {
+	for i := 0; i < r1Len; i++ {
 		prevS1Char := s1Char
-		s1Char = s1[start+i]
-		s2Char := s2[0]
+		s1Char = r1[start+i]
+		s2Char := r2[0]
 		left := i
 		current = left + 1
 		nextTransCost := 0
@@ -53,7 +62,7 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 			jStart += 0
 		}
 
-		if jEnd < s2Len {
+		if jEnd < r2Len {
 			jEnd++
 		} else {
 			jEnd += 0
@@ -67,7 +76,7 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 			v2[j] = current
 			left = v0[j]
 			prevS2Char := s2Char
-			s2Char = s2[j]
+			s2Char = r2[j]
 			if s1Char != s2Char {
 				if left < current {
 					current = left
@@ -90,7 +99,6 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 		if haveMax && v0[i+lenDiff] > maxDist {
 			return -1
 		}
-
 	}
 
 	return current

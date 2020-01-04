@@ -38,6 +38,10 @@ func TestDamerauLevenshtein(t *testing.T) {
 			t.Errorf("Test[%d]: DamerauLevenshtein(%q,%q,%v) returned %v, want %v",
 				i, d.a, d.b, d.maxDist, n, d.want)
 		}
+		n2 := DamerauLevenshteinRunes([]rune(d.a), []rune(d.b), d.maxDist)
+		if n != n2 {
+			t.Error("DamerauLevenshtein() is not equal to DamerauLevenshteinRunes()")
+		}
 	}
 }
 
@@ -54,6 +58,13 @@ func BenchmarkDamerauLevenshtein(b *testing.B) {
 		b.Run(test.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				DamerauLevenshtein(test.a, test.b, test.maxDist)
+			}
+		})
+		b.Run(test.name+"_Runes", func(b *testing.B) {
+			r1 := []rune(test.a)
+			r2 := []rune(test.b)
+			for n := 0; n < b.N; n++ {
+				DamerauLevenshteinRunes(r1, r2, test.maxDist)
 			}
 		})
 	}

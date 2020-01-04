@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestLevenshteinSanity(t *testing.T) {
+func TestLevenshtein(t *testing.T) {
 	tests := []struct {
 		a, b    string
 		maxDist int
@@ -38,6 +38,10 @@ func TestLevenshteinSanity(t *testing.T) {
 			t.Errorf("Test[%d]: Levenshtein(%q,%q,%v) returned %v, want %v",
 				i, d.a, d.b, d.maxDist, n, d.want)
 		}
+		n2 := LevenshteinRunes([]rune(d.a), []rune(d.b), d.maxDist)
+		if n != n2 {
+			t.Error("Levenshtein() is not equal to LevenshteinRunes()")
+		}
 	}
 }
 
@@ -54,6 +58,13 @@ func BenchmarkLevenshtein(b *testing.B) {
 		b.Run(test.name, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				Levenshtein(test.a, test.b, test.maxDist)
+			}
+		})
+		b.Run(test.name+"Rune", func(b *testing.B) {
+			r1 := []rune(test.a)
+			r2 := []rune(test.b)
+			for n := 0; n < b.N; n++ {
+				LevenshteinRunes(r1, r2, test.maxDist)
 			}
 		})
 	}
