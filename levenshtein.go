@@ -30,9 +30,22 @@ func LevenshteinRunes(r1, r2 []rune, maxDist int) int {
 	}
 
 	r1Len, r2Len = ignoreSuffix(r1, r2, r1Len, r2Len)
-	start, r1Len, r2Len, toReturn := ignorePrefix(r1, r2, r1Len, r2Len, maxDist)
-	if toReturn != nil {
-		return *toReturn
+
+	start := 0
+	if r1[start] == r2[start] || r1Len == 0 {
+
+		for start < r1Len && r1[start] == r2[start] {
+			start++
+		}
+		r1Len -= start
+		r2Len -= start
+
+		if r1Len == 0 {
+			if r2Len <= maxDist {
+				return r2Len
+			}
+			return -1
+		}
 	}
 
 	r2 = r2[start : start+r2Len]
@@ -57,14 +70,10 @@ func LevenshteinRunes(r1, r2 []rune, maxDist int) int {
 
 		if i > jStartOffset {
 			jStart++
-		} else {
-			jStart += 0
 		}
 
 		if jEnd < r2Len {
 			jEnd++
-		} else {
-			jEnd += 0
 		}
 
 		for j := jStart; j < jEnd; j++ {
