@@ -32,15 +32,27 @@ func TestDamerauLevenshtein(t *testing.T) {
 		{"Katzchen", "Kätzchen", 10, 1},
 		{"Kätzchen", "Kätzchen", 10, 0},
 	}
+
 	for i, d := range tests {
 		n := DamerauLevenshtein(d.a, d.b, d.maxDist)
 		if n != d.want {
 			t.Errorf("Test[%d]: DamerauLevenshtein(%q,%q,%v) returned %v, want %v",
 				i, d.a, d.b, d.maxDist, n, d.want)
 		}
-		n2 := DamerauLevenshteinRunes([]rune(d.a), []rune(d.b), d.maxDist)
+
+		r1 := []rune(d.a)
+		r2 := []rune(d.b)
+
+		n2 := DamerauLevenshteinRunes(r1, r2, d.maxDist)
 		if n != n2 {
 			t.Error("DamerauLevenshtein() is not equal to DamerauLevenshteinRunes()")
+		}
+
+		x := make([]int, max(len(r1), len(r2)))
+		y := make([]int, max(len(r1), len(r2)))
+		n3 := DamerauLevenshteinRunesBuffer(r1, r2, d.maxDist, x, y)
+		if n != n3 {
+			t.Error("DamerauLevenshtein() is not equal to DamerauLevenshteinRunesBuffer()")
 		}
 	}
 }
@@ -65,6 +77,15 @@ func BenchmarkDamerauLevenshtein(b *testing.B) {
 			r2 := []rune(test.b)
 			for n := 0; n < b.N; n++ {
 				DamerauLevenshteinRunes(r1, r2, test.maxDist)
+			}
+		})
+		b.Run(test.name+"_RunesBuffer", func(b *testing.B) {
+			r1 := []rune(test.a)
+			r2 := []rune(test.b)
+			x := make([]int, max(len(r1), len(r2)))
+			y := make([]int, max(len(r1), len(r2)))
+			for n := 0; n < b.N; n++ {
+				DamerauLevenshteinRunesBuffer(r1, r2, test.maxDist, x, y)
 			}
 		})
 	}

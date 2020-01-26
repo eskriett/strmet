@@ -20,6 +20,12 @@ func Levenshtein(str1, str2 string, maxDist int) int {
 // LevenshteinRunes is the same as Levenshtein but accepts runes instead of
 // strings
 func LevenshteinRunes(r1, r2 []rune, maxDist int) int {
+	return LevenshteinRunesBuffer(r1, r2, maxDist, nil)
+}
+
+// LevenshteinRunesBuffer is the same as LevenshteinRunes but accepts a memory
+// buffer x which should be of length max(r1, r2)
+func LevenshteinRunesBuffer(r1, r2 []rune, maxDist int, x []int) int {
 	if compareRuneSlices(r1, r2) {
 		return 0
 	}
@@ -54,7 +60,11 @@ func LevenshteinRunes(r1, r2 []rune, maxDist int) int {
 		return *toReturn
 	}
 
-	x := getCharCosts(r2Len, maxDist)
+	if x == nil {
+		x = make([]int, r2Len)
+	}
+
+	x = getCharCosts(r2Len, maxDist, x)
 
 	jStartOffset := maxDist - lenDiff
 	haveMax := maxDist < r2Len

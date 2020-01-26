@@ -18,8 +18,10 @@ func compareRuneSlices(a, b []rune) bool {
 	return true
 }
 
-func getCharCosts(length, maxDist int) []int {
-	x := make([]int, length)
+func getCharCosts(length, maxDist int, x []int) []int {
+	if x == nil {
+		x = make([]int, length)
+	}
 
 	i := 0
 	for ; i < maxDist; i++ {
@@ -76,4 +78,11 @@ func ignoreSuffix(s1, s2 []rune, s1Len, s2Len int) (int, int) {
 	}
 
 	return s1Len, s2Len
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

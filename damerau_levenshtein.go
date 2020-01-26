@@ -18,6 +18,12 @@ func DamerauLevenshtein(str1, str2 string, maxDist int) int {
 // DamerauLevenshteinRunes is the same as DamerauLevenshtein but accepts runes
 // instead of strings
 func DamerauLevenshteinRunes(r1, r2 []rune, maxDist int) int {
+	return DamerauLevenshteinRunesBuffer(r1, r2, maxDist, nil, nil)
+}
+
+// DamerauLevenshteinRunesBuffer is the same as DamerauLevenshteinRunes but
+// also accepts memory buffers x and y which should each be of size max(r1, r2).
+func DamerauLevenshteinRunesBuffer(r1, r2 []rune, maxDist int, x, y []int) int {
 	if compareRuneSlices(r1, r2) {
 		return 0
 	}
@@ -53,8 +59,10 @@ func DamerauLevenshteinRunes(r1, r2 []rune, maxDist int) int {
 		return *toReturn
 	}
 
-	v0 := getCharCosts(r2Len, maxDist)
-	v2 := make([]int, r2Len)
+	x = getCharCosts(r2Len, maxDist, x)
+	if y == nil {
+		y = make([]int, r2Len)
+	}
 
 	jStartOffset := maxDist - lenDiff
 	haveMax := maxDist < r2Len
@@ -81,10 +89,10 @@ func DamerauLevenshteinRunes(r1, r2 []rune, maxDist int) int {
 		for j := jStart; j < jEnd; j++ {
 			above := current
 			thisTransCost := nextTransCost
-			nextTransCost = v2[j]
+			nextTransCost = y[j]
 			current = left
-			v2[j] = current
-			left = v0[j]
+			y[j] = current
+			left = x[j]
 			prevS2Char := s2Char
 			s2Char = r2[j]
 			if s1Char != s2Char {
@@ -103,10 +111,10 @@ func DamerauLevenshteinRunes(r1, r2 []rune, maxDist int) int {
 					}
 				}
 			}
-			v0[j] = current
+			x[j] = current
 		}
 
-		if haveMax && v0[i+lenDiff] > maxDist {
+		if haveMax && x[i+lenDiff] > maxDist {
 			return -1
 		}
 	}
